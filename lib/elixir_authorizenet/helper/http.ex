@@ -18,7 +18,7 @@ defmodule AuthorizeNet.Helper.Http do
 
   require Logger
 
-  @typep header :: {char_list, char_list}
+  @typep header :: {charlist, charlist}
   @typep headers :: [header]
   @typep status_code :: Integer
   @typep method :: :get | :post | :delete | :put | :head | :options
@@ -34,7 +34,7 @@ defmodule AuthorizeNet.Helper.Http do
       {'Content-Type', 'application/xml'},
       {'Accept', 'application/xml'}
     |headers]
-    uri = to_char_list "#{uri}?#{qs}"
+    uri = to_charlist "#{uri}?#{qs}"
     body = format_xml(body) |> XmlBuilder.generate
     ret = :ibrowse.send_req(
       uri, headers, method, body, [

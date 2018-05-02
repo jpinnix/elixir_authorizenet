@@ -51,7 +51,7 @@ defmodule AuthorizeNet.Transaction do
             auth_code: nil,
             customer: nil
 
-  @type t :: map()
+  @type t :: Map.t()
 
   @transaction_types [
     void: "voidTransaction",
@@ -320,6 +320,19 @@ defmodule AuthorizeNet.Transaction do
   end
 
   @doc """
+  Pays this transaction with a nounce generated with AcceptJs
+  """
+  @spec pay_with_accept_js(
+          AuthorizeNet.Transaction.t(),
+          String.t()
+        ) :: AuthorizeNet.Transaction.t()
+  def pay_with_accept_js(transaction, data) do
+    %AuthorizeNet.Transaction{transaction | payment_type: :accept_js}
+    |> opaque_data_descriptor("COMMON.ACCEPT.INAPP.PAYMENT")
+    |> opaque_data_value(data)
+  end
+
+  @doc """
   128 characters. Meta data used to specify how the request
   should be processed. The value of dataDescriptor is based on the source of
   the opaqueData dataValue.
@@ -340,7 +353,7 @@ defmodule AuthorizeNet.Transaction do
   The payment gateway expects the encrypted payment data and meta data for
   the encryption keys.
   """
-  @spec opaque_data_descriptor(
+  @spec opaque_data_value(
           AuthorizeNet.Transaction.t(),
           String.t()
         ) :: AuthorizeNet.Transaction.t()
@@ -724,6 +737,14 @@ defmodule AuthorizeNet.Transaction do
       payment:
         case transaction.payment_type do
           :apple_pay ->
+            [
+              opaqueData: [
+                dataDescriptor: transaction.opaque_data_descriptor,
+                dataValue: transaction.opaque_data_value
+              ]
+            ]
+
+          :accept_js ->
             [
               opaqueData: [
                 dataDescriptor: transaction.opaque_data_descriptor,

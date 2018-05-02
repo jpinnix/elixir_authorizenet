@@ -32,6 +32,8 @@ defmodule AuthorizeNet.TransactionResponse do
     success: nil,
     operation_errors: []
 
+  @type t :: %__MODULE__{}
+
   def new(doc) do
     code = xml_one_value_int doc, "//responseCode"
     success = (xml_one_value(doc, "//resultCode") !== "Error") and (code === 1)

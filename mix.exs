@@ -25,12 +25,12 @@ defmodule AuthorizeNet.Mixfile do
 
   defp description do
     """
-Elixir client for the Authorize.Net merchant AIM API.
+    Elixir client for the Authorize.Net merchant AIM API.
 
-A number of features are implemented, but I still consider this as WIP, and pull requests,
-suggestions, or other kind of feedback are very welcome!
+    A number of features are implemented, but I still consider this as WIP, and pull requests,
+    suggestions, or other kind of feedback are very welcome!
 
-User guide at: https://github.com/marcelog/elixir_authorizenet.
+    User guide at: https://github.com/marcelog/elixir_authorizenet.
     """
   end
 

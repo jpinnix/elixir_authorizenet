@@ -140,6 +140,20 @@ defmodule AuthorizeNet.Customer do
    %AuthorizeNet.Customer{profile | profile_id: profile_id}
   end
 
+  @spec create_from_transaction(
+    String.t, String.t, String.t, String.t
+  ) :: AuthorizeNet.Customer.t | no_return
+  def create_from_transaction(id, transaction_id, description, email) do
+    profile = new id, nil, description, email
+    profile_xml = to_xml profile
+    doc = Main.req :createCustomerProfileFromTransactionRequest, [
+      customer: profile_xml,
+      transId: transaction_id,
+    ]
+   profile_id = xml_one_value_int doc, "//customerProfileId"
+   %AuthorizeNet.Customer{profile | profile_id: profile_id}
+  end
+
   @doc """
   Deletes a customer profile by customer profile ID. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-profile

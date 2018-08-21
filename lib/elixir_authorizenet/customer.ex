@@ -169,6 +169,22 @@ defmodule AuthorizeNet.Customer do
     %AuthorizeNet.Customer{customer_profile | payment_profiles: [payment_profile_id]}
   end
 
+  def validate_payment_profile(profile_id, payment_profile_id, card_code, mode) do
+    doc = Main.req :validateCustomerPaymentProfileRequest, [
+      customerProfileId: profile_id,
+      customerPaymentProfileId: payment_profile_id,
+      cardCode: card_code,
+      validationMode: mode
+    ]
+    case xml_one_value(doc, "//resultCode") do
+      "Ok" ->
+        {:ok, payment_profile_id}
+
+      "Error" ->
+        {:error, payment_profile_id}
+    end
+  end
+
   @doc """
   Deletes a customer profile by customer profile ID. See:
   http://developer.authorize.net/api/reference/index.html#manage-customer-profiles-delete-customer-profile

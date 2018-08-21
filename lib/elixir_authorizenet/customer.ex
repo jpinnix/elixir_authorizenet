@@ -19,6 +19,7 @@ defmodule AuthorizeNet.Customer do
   alias AuthorizeNet, as: Main
   alias AuthorizeNet.PaymentProfile, as: PaymentProfile
   alias AuthorizeNet.Address, as: Address
+  alias AuthorizeNet.BaseCustomer, as: BaseCustomer
   defstruct description: nil,
     email: nil,
     id: nil,
@@ -138,6 +139,50 @@ defmodule AuthorizeNet.Customer do
     ]
    profile_id = xml_one_value_int doc, "//customerProfileId"
    %AuthorizeNet.Customer{profile | profile_id: profile_id}
+  end
+
+  @spec create_from_transaction(
+    String.t, String.t, String.t, String.t, String.t
+  ) :: AuthorizeNet.Customer.t | no_return
+  def create_from_transaction(id, nil, transaction_id, description, email) do
+    profile = BaseCustomer.new(id, description, email)
+    profile_xml = BaseCustomer.to_xml(profile)
+    doc = Main.req :createCustomerProfileFromTransactionRequest, [
+      transId: transaction_id,
+      customer: profile_xml
+    ]
+    customer_profile = new id, nil, description, email
+    customer_profile_id = xml_one_value_int doc, "//customerProfileId"
+    payment_profile_id = xml_one_value_int doc, "//numericString"
+
+    %AuthorizeNet.Customer{customer_profile | profile_id: customer_profile_id, payment_profiles: [payment_profile_id]}
+  end
+
+  def create_from_transaction(_id, profile_id, transaction_id, _description, _email) do
+    doc = Main.req :createCustomerProfileFromTransactionRequest, [
+      transId: transaction_id,
+      customerProfileId: profile_id,
+    ]
+    customer_profile = get profile_id
+    payment_profile_id = xml_one_value_int doc, "//numericString"
+
+    %AuthorizeNet.Customer{customer_profile | payment_profiles: [payment_profile_id]}
+  end
+
+  def validate_payment_profile(profile_id, payment_profile_id, card_code, mode) do
+    doc = Main.req :validateCustomerPaymentProfileRequest, [
+      customerProfileId: profile_id,
+      customerPaymentProfileId: payment_profile_id,
+      cardCode: card_code,
+      validationMode: mode
+    ]
+    case xml_one_value(doc, "//resultCode") do
+      "Ok" ->
+        {:ok, payment_profile_id}
+
+      "Error" ->
+        {:error, payment_profile_id}
+    end
   end
 
   @doc """

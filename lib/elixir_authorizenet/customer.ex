@@ -169,12 +169,12 @@ defmodule AuthorizeNet.Customer do
     %AuthorizeNet.Customer{customer_profile | payment_profiles: [payment_profile_id]}
   end
 
-  def validate_payment_profile(profile_id, payment_profile_id, card_code, mode) do
+  def validate_payment_profile(profile_id, payment_profile_id, card_code) do
     doc = Main.req :validateCustomerPaymentProfileRequest, [
       customerProfileId: profile_id,
       customerPaymentProfileId: payment_profile_id,
       cardCode: card_code,
-      validationMode: mode
+      validationMode: Main.validation_mode
     ]
     case xml_one_value(doc, "//resultCode") do
       "Ok" ->

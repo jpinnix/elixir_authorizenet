@@ -175,7 +175,7 @@ defmodule AuthorizeNet.Customer do
         customerProfileId: profile_id,
         customerPaymentProfileId: payment_profile_id,
         cardCode: card_code,
-        validationMode: Main.validation_mode
+        validationMode: "testMode"
       ]
         {:ok, payment_profile_id}
     rescue

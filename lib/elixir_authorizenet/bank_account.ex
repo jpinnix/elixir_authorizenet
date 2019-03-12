@@ -96,11 +96,11 @@ defmodule AuthorizeNet.BankAccount do
     type, bank_name, routing_number, account_number,
     name_on_account, echeck_type
   ) do
-    if not echeck_type in Keyword.keys(@echeck_type) do
+    if not(echeck_type in Keyword.keys(@echeck_type)) do
       raise ArgumentError, "Invalid echeck type, valid ones are: " <>
         "#{inspect Keyword.keys(@echeck_type)}"
     end
-    if not echeck_type in Keyword.keys(@echeck_type) do
+    if not(echeck_type in Keyword.keys(@echeck_type)) do
       raise ArgumentError, "Invalid echeck type, valid ones are: " <>
         "#{inspect Keyword.keys(@echeck_type)}"
     end
